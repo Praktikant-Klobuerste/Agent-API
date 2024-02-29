@@ -2,6 +2,7 @@ from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from schemas import AgentSchema
+import random
 
 
 blp = Blueprint("Agent", __name__, description="Operations on Agents")
@@ -13,21 +14,21 @@ class Agent:
     def __init__(self, name, eye_color):
         self.name = name
         self.eye_color = eye_color
-        self.code = Agent._nAgents
+        self.id = Agent._nAgents
         Agent._nAgents += 1
-        Agent._registry[self.code] = self
+        Agent._registry[self.id] = self
     
     def __eq__(self, other):
         if type(other) != Agent:
             return False
         else:
-            return other.code == self.code
+            return other.id == self.id
         
     def __repr__(self):
-        return f'{self.name, self.eye_color, self.code}'
+        return f'{self.name, self.eye_color, self.id}'
     
     def to_dict(self):
-        return {"name" : self.name, "eye_color" : self.eye_color, "code" : self.code}
+        return {"name" : self.name, "eye_color" : self.eye_color, "id" : self.id}
     
     @classmethod
     def get(cls, agent_id):
@@ -70,3 +71,14 @@ class AgentResource(MethodView):
             del Agent._registry[agent_id]
             return {"message" : f"removed agent {agent_id}"}
         
+
+@blp.route("/agent/random")
+class AgentList(MethodView):
+    def get(self):
+        agent_id_list = list(Agent._registry.keys())
+        if len(agent_id_list):
+            random_agent_id = random.choice(agent_id_list)
+            return Agent.get(random_agent_id).to_dict()
+            # return [agent.to_dict() for agent in Agent._registry.values()]
+        else:
+            abort(404, message="Agent not found.")
