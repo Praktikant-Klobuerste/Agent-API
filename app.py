@@ -20,3 +20,6 @@ api = Api(app)
 api.register_blueprint(AgentBlueprint)
 api.register_blueprint(LairBlueprint)
 api.register_blueprint(TeamBlueprint)
+
+if __name__ == "__main__":
+    app.run(debug=True)
