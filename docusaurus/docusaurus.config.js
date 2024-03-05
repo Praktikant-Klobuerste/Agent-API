@@ -10,7 +10,7 @@ import { themes as prismThemes } from "prism-react-renderer";
 const config = {
   title: "Agent - API",
   tagline: "Dinosaurs are cool",
-  favicon: "img/favicon.ico",
+  favicon: "img/agent.ico",
 
   // Set the production url of your site here
   url: "https://github.com",
@@ -70,7 +70,7 @@ const config = {
         title: "Agent-API",
         logo: {
           alt: "Agent-API WebSocket Logo",
-          src: "img/logo.svg",
+          src: "img/agent.jpg",
         },
         items: [
           {
@@ -93,12 +93,12 @@ const config = {
             title: "Docs",
             items: [
               {
-                label: "C Files",
-                to: "/docs/category/c-files",
+                label: "Resources",
+                to: "/docs/category/resources",
               },
               {
-                label: "Python Files",
-                to: "/docs/category/python-files",
+                label: "Docker Files",
+                to: "/docs/category/docker",
               },
             ],
           },
