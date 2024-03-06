@@ -11,9 +11,12 @@ import TabItem from '@theme/TabItem';
 
 :::info
 
-- Installierten Sie Docker auf Ihrem System.
+Installierten Sie [Docker](https://www.docker.com/products/docker-desktop/) auf Ihrem System.
+
+Nützliche links: 
+- [How to Run PostgreSQL and pgAdmin Using Docker](https://www.commandprompt.com/education/how-to-run-postgresql-and-pgadmin-using-docker/)
+- [Stackoverflow: docker postgres pgadmin local connection](https://stackoverflow.com/questions/25540711/docker-postgres-pgadmin-local-connection?page=1&tab=scoredesc#tab-top)
   :::
-  Link: [Docker - Desktop](https://www.docker.com/products/docker-desktop/)
 
 ### Schritt 1: PostgreSQL-Image herunterladen
 
