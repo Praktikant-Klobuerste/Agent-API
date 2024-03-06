@@ -148,21 +148,44 @@ Docker Desktop
 
 Öffnen Sie Ihren Webbrowser und navigieren Sie zu:
 
-```
+:::tip
 http://localhost:82/
-```
+:::
 
-Melden Sie sich mit Ihrer E-Mail-Adresse und dem Passwort an, die Sie für pgAdmin festgelegt haben.
+Melden Sie sich mit Deiner `E-Mail-Adresse` und dem `Passwort` an, die Du für pgAdmin festgelegt haben.
+
+![pgadmin-log-page.png](../assets/pgadmin-log-page.png)
+
 
 ### Schritt 7: Verbindung zu PostgreSQL herstellen
+<Tabs groupId="pgadmin-initial-config">
+  <TabItem value="1" label="Schritt 1">
+   ![pgadmin-start-page.png](../assets/pgadmin-start-page.png)
 
-In pgAdmin erstellen Sie eine neue Serververbindung:
+  </TabItem>
+  <TabItem value="2" label="Schritt 2">
+   ![pgadmin-page_1.png](../assets/pgadmin-page_1.png)
 
-name: container-postgresdb
-host: host.docker.internal
-database: postgres
-user: postgres
-password: admin
+  </TabItem>
+  <TabItem value="3" label="Schritt 3">
+   ![pgadmin-page_2.png](../assets/pgadmin-page_2.png)
+
+  </TabItem>
+  <TabItem value="4" label="Schritt 4">
+   ![pgadmin-page_3.png](../assets/pgadmin-page_3.png)
+
+  </TabItem>
+</Tabs>
+
+:::note
+In pgAdmin erstelle eine neue Serververbindung:
+
+- `Name`: server-name
+- `host`: host.docker.internal
+- `Maintanance database`: postgres
+- `Username`: your-database-username
+- `Password`: your-database-password
+:::
 
 ## Docker compose
 
@@ -219,7 +242,7 @@ password: admin
 </TabItem>
 
 <TabItem value="pg" label="pgAdmin">
-    ```yaml
+    ```yaml title="docker-compose.yaml"
     agentAPI_pgAdmin:
      image: dpage/pgadmin4
      depends_on:
