@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem';
 
 :::info
 
-Installierten Sie [Docker](https://www.docker.com/products/docker-desktop/) auf Ihrem System.
+Installierte [Docker](https://www.docker.com/products/docker-desktop/) auf Ihrem System.
 
 Nützliche links: 
 - [How to Run PostgreSQL and pgAdmin Using Docker](https://www.commandprompt.com/education/how-to-run-postgresql-and-pgadmin-using-docker/)
@@ -20,7 +20,7 @@ Nützliche links:
 
 ### Schritt 1: PostgreSQL-Image herunterladen
 
-Öffnen Sie das Terminal und führen Sie den folgenden Befehl aus, um das offizielle Postgres-Image zu ziehen:
+Öffne das Terminal und führe den folgenden Befehl aus, um das offizielle Postgres-Image zu ziehen:
 
 ```bash
 docker pull postgres
@@ -32,7 +32,7 @@ Link: [postgres - docker hub](https://hub.docker.com/_/postgres).
 
 ### Schritt 2: PostgreSQL-Container starten
 
-Starten Sie einen Postgres-Container mit einem festgelegten Passwort für den `postgres`-Benutzer:
+Starte einen Postgres-Container mit einem festgelegten Passwort für den `postgres`-Benutzer:
 
 <Tabs groupId="run-code">
   <TabItem value="clear" label="Clear">
@@ -77,7 +77,7 @@ Ersetze `<username>` (oder entferne flag), `<password>` und `<container-postgres
 
 ### Schritt 3: pgAdmin4-Image herunterladen
 
-Laden Sie das pgAdmin4-Image herunter:
+Lade das pgAdmin4-Image herunter:
 
 ```bash
 docker pull dpage/pgadmin4
@@ -89,7 +89,7 @@ Link: [pgAdmin - docker hub](https://hub.docker.com/r/dpage/pgadmin4).
 
 ### Schritt 4: pgAdmin4-Container starten
 
-Erstellen und starten Sie einen pgAdmin4-Container:
+Erstellen und starte einen pgAdmin4-Container:
 
 <Tabs groupId="run-code">
   <TabItem value="clear" label="Clear">
@@ -110,7 +110,7 @@ Erstellen und starten Sie einen pgAdmin4-Container:
   </TabItem>
 </Tabs>
 
-Ersetze `<name@example.com>` mit Ihrer E-Mail-Adresse und `<passwort>` mit einem sicheren Passwort.
+Ersetze `<name@example.com>` mit Deiner E-Mail-Adresse und `<passwort>` mit einem sicheren Passwort.
 
 <details>
   <summary>
@@ -135,7 +135,7 @@ Ersetze `<name@example.com>` mit Ihrer E-Mail-Adresse und `<passwort>` mit einem
 
 ### Schritt 5: Laufende Docker-Container überprüfen
 
-Überprüfen Sie, ob Ihre Container laufen:
+Überprüfe, ob Dein Container laufen:
 
 ```bash
 docker ps
@@ -149,13 +149,13 @@ Docker Desktop
 
 ### Schritt 6: pgAdmin im Browser aufrufen
 
-Öffnen Sie Ihren Webbrowser und navigieren Sie zu:
+Öffne Deinen Webbrowser und navigiere zu:
 
-:::tip
+:::note
 http://localhost:82/
 :::
 
-Melden Sie sich mit Deiner `E-Mail-Adresse` und dem `Passwort` an, die Du für pgAdmin festgelegt haben.
+Melde dich mit Deiner `E-Mail-Adresse` und dem `Passwort` an, die Du für pgAdmin festgelegt haben.
 
 ![pgadmin-log-page.png](../assets/pgadmin-log-page.png)
 
@@ -195,7 +195,7 @@ In pgAdmin erstelle eine neue Serververbindung:
 <Tabs groupId="docker-compose">
   <TabItem value="full" label="Full Code">
 
-    ```yaml {4-14,16-25}
+    ```yaml {4-14,16-25} title="docker-compose.yaml"
    version: '3.8'
 
    services:
@@ -245,7 +245,7 @@ In pgAdmin erstelle eine neue Serververbindung:
 </TabItem>
 
 <TabItem value="pg" label="pgAdmin">
-    ```yaml title="docker-compose.yaml"
+    ```yaml
     agentAPI_pgAdmin:
      image: dpage/pgadmin4
      depends_on:
@@ -279,7 +279,7 @@ In pgAdmin erstelle eine neue Serververbindung:
             2. **Services**:
          </summary>
          <div>
-            - In `services` definieren Sie die Container, die gestartet werden sollen.
+            - In `services` definiere die Container, die gestartet werden sollen.
          </div>
       </details>
       <details>
@@ -321,3 +321,6 @@ In pgAdmin erstelle eine neue Serververbindung:
       </details>
    </div>
 </details>
+:::tip
+Zum Starten der definierten Dienste speichern Sie das Skript in einer Datei namens `docker-compose.yml` und verwenden dann `docker-compose up -d`, um die Container zu starten. Diese Container können dann zum Betrieb Ihrer PostgreSQL-Datenbank mit pgAdmin als Interface genutzt werden.
+:::
