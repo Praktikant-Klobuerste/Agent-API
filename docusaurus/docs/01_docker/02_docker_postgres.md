@@ -16,6 +16,7 @@ Installierte [Docker](https://www.docker.com/products/docker-desktop/) auf Ihrem
 Nützliche links: 
 - [How to Run PostgreSQL and pgAdmin Using Docker](https://www.commandprompt.com/education/how-to-run-postgresql-and-pgadmin-using-docker/)
 - [Stackoverflow: docker postgres pgadmin local connection](https://stackoverflow.com/questions/25540711/docker-postgres-pgadmin-local-connection?page=1&tab=scoredesc#tab-top)
+- [Teclado](https://rest-apis-flask-python-ln6cqvntr-teclado.vercel.app/)
   :::
 
 ### Schritt 1: PostgreSQL-Image herunterladen
@@ -324,3 +325,13 @@ In pgAdmin erstelle eine neue Serververbindung:
 :::tip
 Zum Starten der definierten Dienste speichern Sie das Skript in einer Datei namens `docker-compose.yml` und verwenden dann `docker-compose up -d`, um die Container zu starten. Diese Container können dann zum Betrieb Ihrer PostgreSQL-Datenbank mit pgAdmin als Interface genutzt werden.
 :::
+
+```bash title="cmd"
+# highlight-next-line
+>>>docker-compose up -d
+[+] Running 2/4
+ - Network agent_api_default               Created                          1.2s 
+ - Volume "agent_api_postgres_data"        Created                          1.2s 
+ ✔ Container agent_api-agentAPI-1          Started                          0.8s 
+ ✔ Container agent_api-agentAPI_pgAdmin-1  Started   
+```
