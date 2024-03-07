@@ -1,11 +1,13 @@
 from flask import Flask
 from flask_smorest import Api
+from flask_cors import CORS  # Importieren der CORS Klasse
 
 from resources.agent import blp as AgentBlueprint
 from resources.lair import blp as LairBlueprint
 from resources.team import blp as TeamBlueprint
 
 app = Flask(__name__)
+CORS(app)  # Aktivieren von CORS für die gesamte App
 
 app.config["PROPAGATE_EXCEPTIONS"] = True
 app.config["API_TITLE"] = "Agent API"
