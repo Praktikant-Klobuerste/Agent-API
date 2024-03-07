@@ -48,7 +48,7 @@ const config = {
             "https://github.com/Praktikant-Klobuerste/Agent-API/tree/main/docusaurus",
         },
         blog: {
-          showReadingTime: true,
+          showReadingTime: false,
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
