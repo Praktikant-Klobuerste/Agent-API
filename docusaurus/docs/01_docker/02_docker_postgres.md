@@ -200,7 +200,7 @@ In pgAdmin erstelle eine neue Serververbindung:
    version: '3.8'
 
    services:
-      agentAPI:
+      db:
          image: postgres
          environment:
             POSTGRES_USER: <username>
@@ -212,10 +212,10 @@ In pgAdmin erstelle eine neue Serververbindung:
             - "5432:5432"
          restart: unless-stopped
 
-      agentAPI_pgAdmin:
+      pgAdmin:
          image: dpage/pgadmin4
          depends_on:
-            - agentAPI
+            - db
          environment:
             PGADMIN_DEFAULT_EMAIL: <name@example.com>
             PGADMIN_DEFAULT_PASSWORD: <password>
@@ -231,7 +231,7 @@ In pgAdmin erstelle eine neue Serververbindung:
 
 <TabItem value="db" label="Database">
     ```yaml
-    agentAPI:
+    db:
      image: postgres
      environment:
         POSTGRES_USER: <username>
@@ -247,10 +247,10 @@ In pgAdmin erstelle eine neue Serververbindung:
 
 <TabItem value="pg" label="pgAdmin">
     ```yaml
-    agentAPI_pgAdmin:
+    pgAdmin:
      image: dpage/pgadmin4
      depends_on:
-        - agentAPI
+        - db
      environment:
         PGADMIN_DEFAULT_EMAIL: <name@example.com>
         PGADMIN_DEFAULT_PASSWORD: <password>

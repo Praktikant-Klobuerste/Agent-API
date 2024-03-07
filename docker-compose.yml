@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  agentAPI:
+  db:
      image: postgres
      environment:
         POSTGRES_USER: <username>
@@ -13,10 +13,10 @@ services:
         - "5432:5432"
      restart: unless-stopped
 
-  agentAPI_pgAdmin:
+  pgAdmin:
      image: dpage/pgadmin4
      depends_on:
-        - agentAPI
+        - db
      environment:
         PGADMIN_DEFAULT_EMAIL: <name@example.com>
         PGADMIN_DEFAULT_PASSWORD: <password>
@@ -28,7 +28,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile  # Der Name deiner Dockerfile, falls er nicht standardmäßig 'Dockerfile' heißt
-    image: <Docker-Hub-Username>/agent_backend # Wenn image auch auf Docker-Hub hochgeladen werden soll
+    image: agent_backend # Wenn image auch auf Docker-Hub hochgeladen werden soll: <Docker-Hub-Username>/agent_backend
     ports:
       - "5000:5000"
 
