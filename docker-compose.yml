@@ -24,5 +24,13 @@ services:
         - "82:80"
      restart: unless-stopped
 
+  flask_app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile  # Der Name deiner Dockerfile, falls er nicht standardmäßig 'Dockerfile' heißt
+    image: <Docker-Hub-Username>/agent_backend # Wenn image auch auf Docker-Hub hochgeladen werden soll
+    ports:
+      - "5000:5000"
+
 volumes:
   postgres_data:
