@@ -4,7 +4,7 @@ import styles from './styles.module.css';
 
 const FeatureList = [
   {
-    title: 'Easy to Use',
+    title: 'React',
     Svg: require('@site/static/img/team.svg').default,
     description: (
       <>
@@ -14,8 +14,8 @@ const FeatureList = [
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/agent.svg').default,
+    title: 'Flask',
+    Svg: require('@site/static/img/undraw_pair_programming.svg').default,
     description: (
       <>
         Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
@@ -24,8 +24,8 @@ const FeatureList = [
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_pair_programming.svg').default,
+    title: 'PostgreSQL',
+    Svg: require('@site/static/img/postgresql_elephant.svg').default,
     description: (
       <>
         Extend or customize your website layout by reusing React. Docusaurus can
