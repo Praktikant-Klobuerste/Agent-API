@@ -65,14 +65,12 @@ class TeamsList(MethodView):
     
 
 @blp.route("/team/<int:team_id>")
-class TeamList(MethodView):
-    def get(self,team_id):
+class TeamDetail(MethodView):
+    def get(self, team_id):
         team = Team.get(team_id)
-
-        if team is not None:
-            return Team.get(team_id).to_dict()
-        else:
-            abort(404, message=f"No such team: {team_id}")
+        if team is None:
+            abort(404, message=f"Team with id {team_id} not found.")
+        return team.to_dict()
     
     
 @blp.route("/team/<int:team_id>/agent")
@@ -91,17 +89,16 @@ class TeamAgent(MethodView):
     def post(self, new_data, team_id):
         team = Team.get(team_id)
         if team is None:
-            abort(404, message=f"No such team: {team_id}")
+            abort(404, message=f"Team with id {team_id} not found.")
         
         agent = Agent.get(new_data["agent_id"])
         if agent is None:
-            abort(404, message=f"No such agent: {new_data['agent_id']}")
+            abort(404, message=f"Agent with id {new_data['agent_id']} not found.")
 
         if team.add_agent(agent):
             return Team.get(team_id).to_dict()["agents"], 201
         
-        else:
-            abort(418, message=f"Team {team_id} is full or lair is unsecret")
+        abort(418, message=f"Team {team_id} is full or lair is unsecret")
             
 
     
@@ -109,8 +106,6 @@ class TeamAgent(MethodView):
 class TeamSpace(MethodView):
     def get(self, team_id):
         team = Team.get(team_id)
-
-        if team is not None: 
-            return {"space" : Team.get(team_id).space()}
-        else:
-            abort(404, message=f"No such team: {team_id}")
+        if team is None:
+            abort(404, message=f"Team with id {team_id} not found.")
+        return {"space": team.space()}
