@@ -54,13 +54,11 @@ class TeamsList(MethodView):
     
     @blp.arguments(TeamSchema)
     def post(self, new_data):
-        print(new_data)
         lair = Lair.get(new_data["lair_id"])
         if lair is None:
-            abort(404, message="No such lair_id")
-        else:
-            team = Team(name = new_data["name"], lair = lair)
-            return team.to_dict()
+            abort(404, message="Lair with the specified id not found.")
+        team = Team(name=new_data["name"], lair=lair)
+        return team.to_dict(), 201
         
     
 
