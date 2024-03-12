@@ -67,6 +67,10 @@ class TeamsList(MethodView):
     @blp.arguments(TeamSchema)
     @blp.response(201, TeamSchema)
     def post(self, new_data):
+        # Prüfen, ob der Teamname schon vergeben ist.
+        if any(team.name == new_data["name"] for team in Team._teams.values()):
+            abort(400, message=f"Team name '{new_data['name']}' is already in use.")
+
         lair = Lair.get(new_data["lair_id"])
         if lair is None:
             abort(404, message="Lair with the specified id not found.")
