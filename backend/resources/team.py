@@ -16,12 +16,16 @@ class Team:
         self.name = name
         self.lair = lair
         self.id = Team._nTeams
+        self.agents = {}
         Team._nTeams += 1
         Team._teams[self.id] = self
 
 
     def to_dict(self):
-        return {"name" : self.name, "lair" : self.lair, "id" : self.id}
+        return {"name" : self.name,
+                "lair" : self.lair.to_dict(),
+                "id" : self.id,
+                "agents" : [agents.to_dict() for agents in self.agents.values()]}
     
     @classmethod
     def get(cls, team_id):
@@ -40,17 +44,17 @@ class TeamsList(MethodView):
         if lair is None:
             abort(404, message="No such lair_id")
         else:
-            Team(name = new_data["name"], lair = lair)
-            print(Team._teams)
-            return lair.to_dict()
+            team = Team(name = new_data["name"], lair = lair)
+            return team.to_dict()
+        
     
-@blp.route("/team/<string:team_id>")
+
+@blp.route("/team/<int:team_id>")
 class TeamList(MethodView):
-    def get(team_id):
-        return {team_id}
+    def get(self,team_id):
+        print(Team.get(team_id))
+        return Team.get(team_id).to_dict()
     
-    def put():
-        return {}
     
-    def delete():
-        return {}
+    def post(self, team_id):
+        return
