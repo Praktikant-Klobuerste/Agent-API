@@ -12,3 +12,8 @@ class LairSchema(Schema):
     secret = fields.Bool(dump_only=True)
     name = fields.Str(required=True)
     cap = fields.Int(required=True)
+
+class TeamSchema(Schema):
+    id = fields.Int(dump_only=True)
+    name = fields.Str(required=True)
+    lair_id = fields.Int(required=True)
