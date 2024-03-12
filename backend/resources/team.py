@@ -1,7 +1,7 @@
 from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from schemas import TeamSchema, Agent_to_TeamSchema
+from schemas import TeamSchema, TeamCreateSchema, TeamUpdateSchema, Agent_to_TeamSchema
 from resources.lair import Lair
 from resources.agent import Agent
 
@@ -64,7 +64,7 @@ class TeamsList(MethodView):
     def get(self):
         return [team.to_dict() for team in Team._teams.values()]
     
-    @blp.arguments(TeamSchema)
+    @blp.arguments(TeamCreateSchema)
     @blp.response(201, TeamSchema)
     def post(self, new_data):
         # Prüfen, ob der Teamname schon vergeben ist.
@@ -87,6 +87,24 @@ class TeamDetail(MethodView):
             abort(404, message=f"Team with id {team_id} not found.")
         return team.to_dict()
     
+    # Zum Aktualisieren eines Teams (PUT)
+    @blp.arguments(TeamUpdateSchema)
+    def put(self, update_data, team_id):
+        team = Team.get(team_id)
+        if team is None:
+            abort(404, message=f"Team with id {team_id} not found.")
+        
+        if 'name' in update_data:
+            team.name = update_data['name']
+
+        if 'lair_id' in update_data:
+            # Hier wird das Lair-Objekt basierend auf der lair_id abgefragt und aktualisiert.
+            new_lair = Lair.get(update_data['lair_id'])
+            if new_lair is None:
+                abort(404, message=f"Lair with id {update_data['lair_id']} not found.")
+            team.lair = new_lair
+
+        return team.to_dict(), 200
     
 @blp.route("/team/<int:team_id>/agent")
 class TeamAgent(MethodView):
