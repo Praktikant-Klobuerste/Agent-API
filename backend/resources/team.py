@@ -28,7 +28,7 @@ class Team:
         return self.lair.cap - self.__len__()
 
     def add_agent(self, agent:Agent):
-        if self.space() and self.lair.secret:
+        if self.space() > 0 and self.lair.secret:
             self.agents[agent.id] = agent
             return True
         else:
@@ -53,6 +53,7 @@ class TeamsList(MethodView):
         return [team.to_dict() for team in Team._teams.values()]
     
     @blp.arguments(TeamSchema)
+    @blp.response(201, TeamSchema)
     def post(self, new_data):
         lair = Lair.get(new_data["lair_id"])
         if lair is None:
