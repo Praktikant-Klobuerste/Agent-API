@@ -86,12 +86,31 @@ class TeamAgent(MethodView):
             abort(404, message=f"No such team: {team_id}")
 
 
+
     @blp.arguments(Agent_to_TeamSchema)
     def post(self, new_data, team_id):
         team = Team.get(team_id)
+        if team is None:
+            abort(404, message=f"No such team: {team_id}")
+        
         agent = Agent.get(new_data["agent_id"])
-        Team.get(team_id).add_agent(Agent.get(new_data["agent_id"]))
-        print(team, agent)
+        if agent is None:
+            abort(404, message=f"No such agent: {new_data['agent_id']}")
 
+        if team.add_agent(agent):
+            return Team.get(team_id).to_dict()["agents"], 201
+        
+        else:
+            abort(418, message=f"Team {team_id} is full or lair is unsecret")
+            
 
-        return {},201
+    
+@blp.route("/team/<int:team_id>/space")
+class TeamSpace(MethodView):
+    def get(self, team_id):
+        team = Team.get(team_id)
+
+        if team is not None: 
+            return {"space" : Team.get(team_id).space()}
+        else:
+            abort(404, message=f"No such team: {team_id}")
