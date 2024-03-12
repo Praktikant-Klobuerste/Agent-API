@@ -32,7 +32,19 @@ class Team:
             self.agents[agent.id] = agent
             return True
         else:
-            return False    
+            return False
+
+
+    def contains(self, agent:Agent):
+        return agent.code in self.agents
+
+
+    def flee(self, other):
+        agents_copy = self.agents.copy()
+        for agent in agents_copy.values():
+            if not other.contains(agent) and other.space():
+                other.add_agent(agent)
+                self.agents.pop(agent.code)
 
 
     def to_dict(self):
