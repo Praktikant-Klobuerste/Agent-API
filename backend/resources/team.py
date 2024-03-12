@@ -39,7 +39,7 @@ class Team:
         return {"name" : self.name,
                 "lair" : self.lair.to_dict(),
                 "id" : self.id,
-                "agents" : [agents.to_dict() for agents in self.agents.values()]}
+                "agents" : [agent.to_dict() for agent in self.agents.values()]}
     
     @classmethod
     def get(cls, team_id):
