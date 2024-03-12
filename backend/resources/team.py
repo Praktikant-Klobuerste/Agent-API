@@ -78,7 +78,7 @@ class TeamAgent(MethodView):
         team = Team.get(team_id)
 
         if team is not None: 
-            return Team.get(team_id).to_dict()["agents"]
+            return team.to_dict()["agents"]
         else:
             abort(404, message=f"No such team: {team_id}")
 
@@ -95,7 +95,7 @@ class TeamAgent(MethodView):
             abort(404, message=f"Agent with id {new_data['agent_id']} not found.")
 
         if team.add_agent(agent):
-            return Team.get(team_id).to_dict()["agents"], 201
+            return team.to_dict()["agents"], 201
         
         abort(418, message=f"Team {team_id} is full or lair is unsecret")
             
