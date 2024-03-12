@@ -17,3 +17,6 @@ class TeamSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
     lair_id = fields.Int(required=True)
+
+class Agent_to_TeamSchema(Schema):
+    agent_id = fields.Int(required=True)
