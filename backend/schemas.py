@@ -34,3 +34,7 @@ class TeamUpdateSchema(Schema):
 
 class Agent_to_TeamSchema(Schema):
     agent_id = fields.Int(required=True, description="The id of the Agent being added to the Team", metadata={"example": 5}, validate=validate.Range(min=0))
+
+class TeamFleeSchema(Schema):
+    random = fields.Boolean(missing=False)  # Optional, standardmäßig false, wenn nicht angegeben
+    other_team = fields.Integer(strict=True, required=False)  # Strikte Validierung auf Integer-Werte, optional

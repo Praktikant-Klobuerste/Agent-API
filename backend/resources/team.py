@@ -1,9 +1,10 @@
 from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from schemas import TeamSchema, TeamCreateSchema, TeamUpdateSchema, Agent_to_TeamSchema
+from schemas import TeamSchema, TeamCreateSchema, TeamUpdateSchema, Agent_to_TeamSchema, TeamFleeSchema
 from resources.lair import Lair
 from resources.agent import Agent
+import random
 
 teams = {}
 blp = Blueprint("Team", __name__, description="Operations on Teams")
@@ -152,6 +153,33 @@ class TeamSpace(MethodView):
         if team is None:
             abort(404, message=f"Team with id {team_id} not found.")
         return {"space": team.space()}
+    
+
+@blp.route("/team/<int:team_id>/flee")
+class TeamFlee(MethodView):
+    @blp.arguments(TeamFleeSchema)
+    def put(self, update_data, team_id):
+        random_choice = False
+        other_team = None
+
+        team = Team.get(team_id)
+        if team is None:
+            abort(404, message=f"Team with id {team_id} not found.")
+
+        if 'random' in update_data:
+            random_choice = update_data['random']
+        if random_choice:
+            team_list = list(Team._teams.values())
+            if team_list:
+                other_team = random.choice(team_list)
+
+        elif "other_team" in update_data:
+            other_team = Team.get(update_data['other_team'])
+            if other_team is None:
+                abort(404, message=f"Other Team with id {update_data['other_team']} not found.")
+
+        team.flee(other_team)
+        return {"message": "Flee operation successful"}, 200
     
 
 @blp.route("/team/<int:team_id>/agent/<int:agent_id>")
