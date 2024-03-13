@@ -117,7 +117,7 @@ class TeamDetail(MethodView):
             abort(404, message=f"Team with id {team_id} not found.")
         
         del Team._teams[team_id] # Löscht die Referenz zum Team
-        return {"message" : f"removed agent {team_id}"},  204
+        return {"message" : f"removed team {team_id}"},  204
     
     
 
