@@ -24,6 +24,9 @@ class Team:
 
     def __len__(self):
         return len(self.agents)
+    
+    def __eq__(self, other: object) -> bool:
+        return self.id == other.id
 
     def space(self):
         return self.lair.cap - self.__len__()
@@ -159,25 +162,35 @@ class TeamSpace(MethodView):
 class TeamFlee(MethodView):
     @blp.arguments(TeamFleeSchema)
     def put(self, update_data, team_id):
-        random_choice = False
-        other_team = None
+        random_choice = update_data.get('random', False)
+        other_team_id = update_data.get('other_team')
 
+        # Validiere die Eingabedaten
+        if random_choice and other_team_id is not None:
+            abort(400, message='Cannot specify "other_team" when "random" is true.')
+        if not random_choice and other_team_id is None:
+            abort(400, message='Must specify "other_team" when "random" is false.')
+
+        # Hole das Team
         team = Team.get(team_id)
         if team is None:
             abort(404, message=f"Team with id {team_id} not found.")
 
-        if 'random' in update_data:
-            random_choice = update_data['random']
+        # Wähle ein zufälliges Team oder ein spezifisches Team
         if random_choice:
-            team_list = list(Team._teams.values())
-            if team_list:
-                other_team = random.choice(team_list)
+            team_list = [t for t in Team._teams.values() if t != team]  # Team kann nicht vor sich selbst fliehen
+            if not team_list:
+                abort(404, message="No other teams available to flee to.")
+            other_team = random.choice(team_list)
+        else:
+            other_team = Team.get(other_team_id)
+            if team == other_team:
+                abort(404, message="Can't flee to same team.")
 
-        elif "other_team" in update_data:
-            other_team = Team.get(update_data['other_team'])
-            if other_team is None:
-                abort(404, message=f"Other Team with id {update_data['other_team']} not found.")
+            elif other_team is None:
+                abort(404, message=f"Other Team with id {other_team_id} not found.")
 
+        # Führe den Fluchtvorgang aus
         team.flee(other_team)
         return {"message": "Flee operation successful"}, 200
     
