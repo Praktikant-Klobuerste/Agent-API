@@ -62,6 +62,12 @@ class Team:
         return cls._teams.get(team_id)
     
     
+def get_resource_or_404(model, resource_id, resource_name):
+    resource = model.get(resource_id)
+    if resource is None:
+        abort(404, message=f"{resource_name} with id {resource_id} not found.")
+    return resource
+
 
 @blp.route("/team")
 class TeamsList(MethodView):
@@ -86,18 +92,13 @@ class TeamsList(MethodView):
 @blp.route("/team/<int:team_id>")
 class TeamDetail(MethodView):
     def get(self, team_id):
-        team = Team.get(team_id)
-        if team is None:
-            abort(404, message=f"Team with id {team_id} not found.")
+        team = get_resource_or_404(Team, team_id, "Team")
         return team.to_dict()
     
     # Zum Aktualisieren eines Teams (PUT)
     @blp.arguments(TeamUpdateSchema)
     def put(self, update_data, team_id):
-        team = Team.get(team_id)
-        if team is None:
-            abort(404, message=f"Team with id {team_id} not found.")
-        
+        team = get_resource_or_404(Team, team_id, "Team")    
         if 'name' in update_data:
             team.name = update_data['name']
 
@@ -112,10 +113,7 @@ class TeamDetail(MethodView):
     
     
     def delete(self, team_id):
-        team = Team.get(team_id)
-        if team is None:
-            abort(404, message=f"Team with id {team_id} not found.")
-        
+        team = get_resource_or_404(Team, team_id, "Team")  
         del Team._teams[team_id] # Löscht die Referenz zum Team
         return {"message" : f"removed team {team_id}"},  204
     
@@ -124,23 +122,16 @@ class TeamDetail(MethodView):
 @blp.route("/team/<int:team_id>/agent")
 class TeamAgent(MethodView):
     def get(self, team_id):
-        team = Team.get(team_id)
-        if team is None: 
-            abort(404, message=f"Team with id {team_id} not found.")
-
+        team = get_resource_or_404(Team, team_id, "Team")
         return team.to_dict()["agents"]
 
 
 
     @blp.arguments(Agent_to_TeamSchema)
     def post(self, new_data, team_id):
-        team = Team.get(team_id)
-        if team is None:
-            abort(404, message=f"Team with id {team_id} not found.")
-        
-        agent = Agent.get(new_data["agent_id"])
-        if agent is None:
-            abort(404, message=f"Agent with id {new_data['agent_id']} not found.")
+        team = get_resource_or_404(Team, team_id, "Team")
+        agent = get_resource_or_404(Agent, new_data.get("agent_id"), "Agent")
+       
 
         if team.add_agent(agent):
             return team.to_dict()["agents"], 201
@@ -152,9 +143,7 @@ class TeamAgent(MethodView):
 @blp.route("/team/<int:team_id>/space")
 class TeamSpace(MethodView):
     def get(self, team_id):
-        team = Team.get(team_id)
-        if team is None:
-            abort(404, message=f"Team with id {team_id} not found.")
+        team = get_resource_or_404(Team, team_id, "Team")
         return {"space": team.space()}
     
 
@@ -172,10 +161,7 @@ class TeamFlee(MethodView):
             abort(400, message='Must specify "other_team" when "random" is false.')
 
         # Hole das Team
-        team = Team.get(team_id)
-        if team is None:
-            abort(404, message=f"Team with id {team_id} not found.")
-
+        team = get_resource_or_404(Team, team_id, "Team")
         # Wähle ein zufälliges Team oder ein spezifisches Team
         if random_choice:
             team_list = [t for t in Team._teams.values() if t != team]  # Team kann nicht vor sich selbst fliehen
@@ -199,8 +185,8 @@ class TeamFlee(MethodView):
 @blp.route("/team/<int:team_id>/agent/<int:agent_id>")
 class TeamAgentDetail(MethodView):
     def delete(self, team_id, agent_id):
-        team = Team.get(team_id)
-        if team is None or agent_id not in team.agents:
+        team = get_resource_or_404(Team, team_id, "Team")
+        if agent_id not in team.agents:
             abort(404, message=f"Agent {agent_id} in Team {team_id} not found.")
         
         del team.agents[agent_id]  # Entfernt den Agenten aus dem Team
