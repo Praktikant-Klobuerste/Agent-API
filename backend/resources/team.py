@@ -31,12 +31,11 @@ class Team:
     def space(self):
         return self.lair.cap - self.__len__()
 
-    def add_agent(self, agent:Agent):
-        if self.space() > 0 and self.lair.secret:
-            self.agents[agent.id] = agent
-            return True
-        else:
-            return False
+def add_agent(self, agent: Agent) -> bool:
+    if not self.lair.secret or self.space() <= 0:
+        return False
+    self.agents[agent.id] = agent
+    return True
 
 
     def contains(self, agent:Agent):
