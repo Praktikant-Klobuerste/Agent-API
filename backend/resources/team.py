@@ -36,7 +36,7 @@ class Team:
 
 
     def contains(self, agent:Agent):
-        return agent.code in self.agents
+        return agent.id in self.agents
 
 
     def flee(self, other):
@@ -44,7 +44,7 @@ class Team:
         for agent in agents_copy.values():
             if not other.contains(agent) and other.space():
                 other.add_agent(agent)
-                self.agents.pop(agent.code)
+                self.agents.pop(agent.id)
 
 
     def to_dict(self):
@@ -106,15 +106,25 @@ class TeamDetail(MethodView):
 
         return team.to_dict(), 200
     
+    
+    def delete(self, team_id):
+        team = Team.get(team_id)
+        if team is None:
+            abort(404, message=f"Team with id {team_id} not found.")
+        
+        del Team._teams[team_id] # Löscht die Referenz zum Team
+        return {"message" : f"removed agent {team_id}"},  204
+    
+    
+
 @blp.route("/team/<int:team_id>/agent")
 class TeamAgent(MethodView):
     def get(self, team_id):
         team = Team.get(team_id)
+        if team is None: 
+            abort(404, message=f"Team with id {team_id} not found.")
 
-        if team is not None: 
-            return team.to_dict()["agents"]
-        else:
-            abort(404, message=f"No such team: {team_id}")
+        return team.to_dict()["agents"]
 
 
 
@@ -142,3 +152,14 @@ class TeamSpace(MethodView):
         if team is None:
             abort(404, message=f"Team with id {team_id} not found.")
         return {"space": team.space()}
+    
+
+@blp.route("/team/<int:team_id>/agent/<int:agent_id>")
+class TeamAgentDetail(MethodView):
+    def delete(self, team_id, agent_id):
+        team = Team.get(team_id)
+        if team is None or agent_id not in team.agents:
+            abort(404, message=f"Agent {agent_id} in Team {team_id} not found.")
+        
+        del team.agents[agent_id]  # Entfernt den Agenten aus dem Team
+        return {"message" : f"removed agent {agent_id} from Team with id {team_id}"}, 204
