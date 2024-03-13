@@ -184,11 +184,12 @@ class TeamFlee(MethodView):
             other_team = random.choice(team_list)
         else:
             other_team = Team.get(other_team_id)
-            if team == other_team:
-                abort(404, message="Can't flee to same team.")
+            
+        if other_team is None:
+            abort(404, message=f"Other Team with id {other_team_id} not found.")
 
-            elif other_team is None:
-                abort(404, message=f"Other Team with id {other_team_id} not found.")
+        if team == other_team:
+            abort(404, message="Can't flee to same team.")
 
         # Führe den Fluchtvorgang aus
         team.flee(other_team)
