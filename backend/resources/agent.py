@@ -24,6 +24,9 @@ class Agent:
         else:
             return other.id == self.id
         
+    def __len__(self):
+        return len(Agent._registry)
+        
     def __repr__(self):
         return f'{self.name, self.eye_color, self.id}'
     
@@ -34,6 +37,12 @@ class Agent:
     def get(cls, agent_id):
         return cls._registry.get(agent_id)
 
+
+def get_resource_or_404(model:object, resource_id:str, resource_name:str):
+    resource = model.get(resource_id)
+    if resource is None:
+        abort(404, message=f"{resource_name} with id {resource_id} not found.")
+    return resource
 
 
 @blp.route("/agent")
@@ -46,7 +55,7 @@ class AgentList(MethodView):
     @blp.arguments(AgentSchema)
     @blp.response(201, AgentSchema)
     def post(self, new_data):
-        # print(new_data)
+
         agent = Agent(**new_data)
         print(Agent._registry)
         return agent.to_dict()
@@ -57,28 +66,23 @@ class AgentList(MethodView):
 class AgentResource(MethodView):
     @blp.response(200, AgentSchema)
     def get(self, agent_id):
-        agent = Agent.get(agent_id)
-        if agent is None:
-            abort(404, message="Agent not found.")
-        else:
-            return agent.to_dict()
+        agent = get_resource_or_404(Agent, agent_id, "Agent")
+        
+        return agent.to_dict()
 
     def delete(self, agent_id):
-        agent = Agent.get(agent_id)
-        if agent is None:
-            abort(404, message="Agent not found.")
-        else:
-            del Agent._registry[agent_id]
-            return {"message" : f"removed agent {agent_id}"}
+        get_resource_or_404(Agent, agent_id, "Agent")
+
+        del Agent._registry[agent_id]
+        return {"message" : f"removed agent {agent_id}"}
         
 
 @blp.route("/agent/random")
 class AgentList(MethodView):
     def get(self):
         agent_id_list = list(Agent._registry.keys())
-        if len(agent_id_list):
-            random_agent_id = random.choice(agent_id_list)
-            return Agent.get(random_agent_id).to_dict()
-            # return [agent.to_dict() for agent in Agent._registry.values()]
-        else:
-            abort(404, message="Agent not found.")
+        if len(agent_id_list) <= 0:
+            abort(404, message="There is no Agent.")
+
+        random_agent_id = random.choice(agent_id_list)
+        return Agent.get(random_agent_id).to_dict()
