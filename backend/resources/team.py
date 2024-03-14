@@ -60,6 +60,10 @@ class Team:
     def get(cls, team_id):
         return cls._teams.get(team_id)
     
+    @classmethod
+    def name_exists(cls, name: str) -> bool:
+        return any(team.name == name for team in cls._teams.values())
+    
     
 def get_resource_or_404(model, resource_id, resource_name):
     resource = model.get(resource_id)
@@ -77,7 +81,7 @@ class TeamsList(MethodView):
     @blp.response(201, TeamSchema)
     def post(self, new_data):
         # Prüfen, ob der Teamname schon vergeben ist.
-        if any(team.name == new_data["name"] for team in Team._teams.values()):
+        if Team.name_exists(new_data["name"]):
             abort(400, message=f"Team name '{new_data['name']}' is already in use.")
 
         lair = Lair.get(new_data["lair_id"])
