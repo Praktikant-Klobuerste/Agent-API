@@ -42,12 +42,12 @@ class Team:
         return agent.id in self.agents
 
 
-    def flee(self, other):
-        agents_copy = self.agents.copy()
-        for agent in agents_copy.values():
+    def flee(self, other) -> None:
+        agents_copy = list(self.agents.values())
+        for agent in agents_copy:
             if not other.contains(agent) and other.space():
                 other.add_agent(agent)
-                self.agents.pop(agent.id)
+                del self.agents[agent.id]
 
 
     def to_dict(self):
