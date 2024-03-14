@@ -2,3 +2,5 @@ flask
 flask-smorest
 python-dotenv
 flask_cors
+pytest
+requests
