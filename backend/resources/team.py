@@ -204,7 +204,8 @@ class TeamsList(MethodView):
     @blp.response(201, TeamSchema)
     def post(self, new_data):
         """
-        Verarbeitet POST-Anfragen, um ein neues Team basierend auf den übergebenen Daten zu erstellen.
+        Verarbeitet POST-Anfragen, um ein neues Team basierend auf den übergebenen 
+        Daten zu erstellen.
         
         Prüft, ob der Teamname bereits verwendet wird, und ob das angegebene Versteck existiert.
         Erstellt ein neues Team, wenn die Validierung erfolgreich ist.
@@ -213,11 +214,13 @@ class TeamsList(MethodView):
             new_data (dict): Ein Dictionary mit den Daten des zu erstellenden Teams.
         
         Returns:
-            tuple: Ein Tuple, bestehend aus dem Dictionary, das das neue Team repräsentiert, und dem HTTP-Statuscode 201.
+            tuple: Ein Tuple, bestehend aus dem Dictionary, das das neue Team repräsentiert, 
+            und dem HTTP-Statuscode 201.
         
         Raises:
-            HTTPException: Eine Exception mit einem 400 Statuscode, wenn der Teamname bereits verwendet wird,
-                           oder mit einem 404 Statuscode, wenn das angegebene Versteck nicht gefunden wird.
+            HTTPException: Eine Exception mit einem 400 Statuscode, wenn der Teamname 
+                           bereits verwendet wird, oder mit einem 404 Statuscode, 
+                           wenn das angegebene Versteck nicht gefunden wird.
         """
         # Prüfen, ob der Teamname schon vergeben ist.
         if Team.name_exists(new_data["name"]):
@@ -234,19 +237,50 @@ class TeamsList(MethodView):
 
 @blp.route("/team/<int:team_id>")
 class TeamDetail(MethodView):
+    """
+    Eine View-Klasse, die Operationen für ein spezifisches Team über eine REST-API bereitstellt.
+    
+    Ermöglicht das Abrufen, Aktualisieren und Löschen von Teams anhand ihrer ID.
+    """
+
     def get(self, team_id):
+        """
+        Verarbeitet GET-Anfragen, um ein spezifisches Team basierend auf seiner ID zurückzugeben.
+        
+        Parameter:
+            team_id (int): Die ID des abzurufenden Teams.
+        
+        Returns:
+            dict: Ein Dictionary, das das Team repräsentiert.
+            
+        Raises:
+            HTTPException: Eine Exception mit einem 404 Statuscode, wenn das Team nicht gefunden wird.
+        """
         team = get_resource_or_404(Team, team_id, "Team")
         return team.to_dict()
 
-    # Zum Aktualisieren eines Teams (PUT)
     @blp.arguments(TeamUpdateSchema)
     def put(self, update_data, team_id):
+        """
+        Verarbeitet PUT-Anfragen, um ein spezifisches Team basierend auf seiner ID zu aktualisieren.
+        
+        Parameter:
+            update_data (dict): Ein Dictionary mit den zu aktualisierenden Daten des Teams.
+            team_id (int): Die ID des zu aktualisierenden Teams.
+        
+        Returns:
+            tuple: Ein Tuple, bestehend aus dem aktualisierten Team als Dictionary 
+                   und dem HTTP-Statuscode 200.
+            
+        Raises:
+            HTTPException: Eine Exception mit einem 404 Statuscode, wenn das Team oder das 
+                           angegebene Versteck nicht gefunden wird.
+        """
         team = get_resource_or_404(Team, team_id, "Team")    
         if 'name' in update_data:
             team.name = update_data['name']
 
         if 'lair_id' in update_data:
-            # Hier wird das Lair-Objekt basierend auf der lair_id abgefragt und aktualisiert.
             new_lair = Lair.get(update_data['lair_id'])
             if new_lair is None:
                 abort(404, message=f"Lair with id {update_data['lair_id']} not found.")
@@ -254,27 +288,80 @@ class TeamDetail(MethodView):
 
         return team.to_dict(), 200
 
-
     def delete(self, team_id):
+        """
+        Verarbeitet DELETE-Anfragen, um ein spezifisches Team basierend auf seiner ID zu löschen.
+        
+        Parameter:
+            team_id (int): Die ID des zu löschenden Teams.
+        
+        Returns:
+            tuple: Ein Tuple, bestehend aus einer Nachricht über den Erfolg des Löschvorgangs 
+                   und dem HTTP-Statuscode 204.
+            
+        Raises:
+            HTTPException: Eine Exception mit einem 404 Statuscode, wenn das Team nicht 
+                           gefunden wird.
+        """
         get_resource_or_404(Team, team_id, "Team")
         del Team.teams[team_id] # Löscht die Referenz zum Team
-        return {"message" : f"removed team {team_id}"},  204
+        return {"message": f"removed team {team_id}"}, 204
+
 
 
 
 @blp.route("/team/<int:team_id>/agent")
 class TeamAgent(MethodView):
+    """
+    Eine View-Klasse, die Operationen für Agenten innerhalb eines spezifischen Teams über 
+    eine REST-API bereitstellt.
+    
+    Ermöglicht das Abrufen der Liste aller Agenten eines Teams und das Hinzufügen eines 
+    Agenten zu einem Team.
+    """
+
     def get(self, team_id):
+        """
+        Verarbeitet GET-Anfragen, um die Liste aller Agenten eines spezifischen Teams zurückzugeben.
+        
+        Parameter:
+            team_id (int): Die ID des Teams, dessen Agenten abgerufen werden sollen.
+        
+        Returns:
+            list: Eine Liste von Dictionaries, die die Agenten des Teams repräsentieren.
+            
+        Raises:
+            HTTPException: Eine Exception mit einem 404 Statuscode, wenn das Team 
+            nicht gefunden wird.
+        """
         team = get_resource_or_404(Team, team_id, "Team")
         return team.to_dict()["agents"]
 
-
-
     @blp.arguments(Agent_to_TeamSchema)
     def post(self, new_data, team_id):
+        """
+        Verarbeitet POST-Anfragen, um einen neuen Agenten zu einem spezifischen Team hinzuzufügen.
+        
+        Überprüft zunächst, ob das Team und der Agent existieren. Fügt den Agenten zum Team hinzu, 
+        wenn im Team Platz ist und das Versteck geheim ist. Gibt andernfalls einen Fehler zurück.
+        
+        Parameter:
+            new_data (dict): Ein Dictionary mit den Daten des Agenten, der zum Team 
+            hinzugefügt werden soll. 
+            team_id (int): Die ID des Teams, zu dem der Agent hinzugefügt werden soll.
+        
+        Returns:
+            tuple: Ein Tuple, bestehend aus der aktualisierten Liste der Agenten des Teams 
+                   als Dictionary und dem HTTP-Statuscode 201, wenn der Agent erfolgreich 
+                   hinzugefügt wurde.
+            
+        Raises:
+            HTTPException: Eine Exception mit einem 418 Statuscode, wenn das Team voll ist oder 
+                           das Versteck nicht geheim ist, oder mit einem 404 Statuscode, 
+                           wenn das Team oder der Agent nicht gefunden wird.
+        """
         team = get_resource_or_404(Team, team_id, "Team")
         agent = get_resource_or_404(Agent, new_data.get("agent_id"), "Agent")
-
 
         if team.add_agent(agent):
             return team.to_dict()["agents"], 201
@@ -282,7 +369,8 @@ class TeamAgent(MethodView):
         abort(418, message=f"Team {team_id} is full or lair is unsecret")
 
 
-    
+
+
 @blp.route("/team/<int:team_id>/space")
 class TeamSpace(MethodView):
     def get(self, team_id):
