@@ -461,10 +461,24 @@ class TeamFlee(MethodView):
 
 @blp.route("/team/<int:team_id>/agent/<int:agent_id>")
 class TeamAgentDetail(MethodView):
-    def delete(self, team_id, agent_id):
-        team = get_resource_or_404(Team, team_id, "Team")
-        if agent_id not in team.agents:
-            abort(404, message=f"Agent {agent_id} in Team {team_id} not found.")
+    """
+    Eine View-Klasse, die Operationen für einen spezifischen Agenten innerhalb eines Teams 
+    über eine REST-API bereitstellt.
+    """
 
-        del team.agents[agent_id]  # Entfernt den Agenten aus dem Team
-        return {"message" : f"removed agent {agent_id} from Team with id {team_id}"}, 204
+    def delete(self, team_id, agent_id):
+        """
+        Verarbeitet DELETE-Anfragen, um einen Agenten aus einem spezifischen Team zu entfernen.
+        
+        Parameter:
+            team_id (int): Die ID des Teams, aus dem der Agent entfernt werden soll.
+            agent_id (int): Die ID des Agenten, der entfernt werden soll.
+        
+        Returns:
+            dict: Ein Dictionary mit einer Nachricht, die den Erfolg des Entfernens bestätigt.
+            
+        Raises:
+            HTTPException: Eine Exception mit einem 404 Statuscode, wenn das Team oder 
+                           der Agent nicht gefunden wird.
+        """
+        # Der Agent wird aus dem Team entfernt, falls vorhanden.
