@@ -1,4 +1,3 @@
-from flask import request
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from schemas import TeamSchema, TeamCreateSchema, TeamUpdateSchema, Agent_to_TeamSchema, TeamFleeSchema
@@ -13,23 +12,23 @@ blp = Blueprint("Team", __name__, description="Operations on Teams")
 
 class Team:
     _nTeams = 0
-    _teams = {}
+    teams = {}
     def __init__(self, name, lair:Lair):
         self.name = name
         self.lair = lair
         self.id = Team._nTeams
         self.agents = {}
         Team._nTeams += 1
-        Team._teams[self.id] = self
+        Team.teams[self.id] = self
 
     def __len__(self):
         return len(self.agents)
-    
+
     def __eq__(self, other: object) -> bool:
         return self.id == other.id
 
     def space(self):
-        return self.lair.cap - self.__len__()
+        return self.lair.cap - len(self)
 
     def add_agent(self, agent: Agent) -> bool:
         if not self.lair.secret or self.space() <= 0:
@@ -58,11 +57,11 @@ class Team:
     
     @classmethod
     def get(cls, team_id):
-        return cls._teams.get(team_id)
+        return cls.teams.get(team_id)
     
     @classmethod
     def name_exists(cls, name: str) -> bool:
-        return any(team.name == name for team in cls._teams.values())
+        return any(team.name == name for team in cls.teams.values())
     
     
 def get_resource_or_404(model, resource_id, resource_name):
@@ -75,7 +74,7 @@ def get_resource_or_404(model, resource_id, resource_name):
 @blp.route("/team")
 class TeamsList(MethodView):
     def get(self):
-        return [team.to_dict() for team in Team._teams.values()]
+        return [team.to_dict() for team in Team.teams.values()]
     
     @blp.arguments(TeamCreateSchema)
     @blp.response(201, TeamSchema)
@@ -117,7 +116,7 @@ class TeamDetail(MethodView):
     
     def delete(self, team_id):
         team = get_resource_or_404(Team, team_id, "Team")  
-        del Team._teams[team_id] # Löscht die Referenz zum Team
+        del Team.teams[team_id] # Löscht die Referenz zum Team
         return {"message" : f"removed team {team_id}"},  204
     
     
@@ -167,7 +166,7 @@ class TeamFlee(MethodView):
         team = get_resource_or_404(Team, team_id, "Team")
         # Wähle ein zufälliges Team oder ein spezifisches Team
         if random_choice:
-            team_list = [t for t in Team._teams.values() if t != team]  # Team kann nicht vor sich selbst fliehen
+            team_list = [t for t in Team.teams.values() if t != team]  # Team kann nicht vor sich selbst fliehen
             if not team_list:
                 abort(404, message="No other teams available to flee to.")
             other_team = random.choice(team_list)
@@ -191,6 +190,6 @@ class TeamAgentDetail(MethodView):
         team = get_resource_or_404(Team, team_id, "Team")
         if agent_id not in team.agents:
             abort(404, message=f"Agent {agent_id} in Team {team_id} not found.")
-        
+
         del team.agents[agent_id]  # Entfernt den Agenten aus dem Team
         return {"message" : f"removed agent {agent_id} from Team with id {team_id}"}, 204
