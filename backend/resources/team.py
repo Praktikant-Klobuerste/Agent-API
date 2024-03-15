@@ -102,7 +102,8 @@ class Team:
 
     def flee(self, other:'Team'):
         """
-        Überträgt Agenten zum anderen Team, wenn im anderen Team Platz ist und der Agent nicht bereits dort ist.
+        Überträgt Agenten zum anderen Team, 
+        wenn im anderen Team Platz ist und der Agent nicht bereits dort ist.
         
         Parameter:
             other (Team): Das Team, zu dem die Agenten fliehen.
@@ -154,11 +155,32 @@ class Team:
 
 
 
-def get_resource_or_404(model, resource_id, resource_name):
+def get_resource_or_404(model:object, resource_id, resource_name:str):
+    """
+    Versucht, eine Ressource anhand ihrer ID aus einem Datenmodell abzurufen. 
+    Gibt die Ressource zurück, wenn sie gefunden wird. Löst einen 404 Fehler aus, 
+    wenn die Ressource nicht gefunden werden kann.
+
+    Parameter:
+        model (object): Das Datenmodell, aus dem die Ressource abgerufen wird. 
+               Es wird erwartet, dass dieses Modell eine 'get'-Methode hat.
+        resource_id (int or str): Die ID der abzurufenden Ressource.
+        resource_name (str): Der Name der Ressource, verwendet für die Fehlermeldung, 
+                             falls die Ressource nicht gefunden wird.
+
+    Returns:
+        Die abgerufene Ressource, wenn sie gefunden wird.
+
+    Raises:
+        HTTPException: Eine Exception mit einem 404 Statuscode, 
+                       wenn die Ressource nicht gefunden werden kann, 
+                       mit einer Nachricht, die das Fehlen der Ressource angibt.
+    """
     resource = model.get(resource_id)
     if resource is None:
         abort(404, message=f"{resource_name} with id {resource_id} not found.")
     return resource
+
 
 
 @blp.route("/team")
@@ -205,7 +227,7 @@ class TeamDetail(MethodView):
 
 
     def delete(self, team_id):
-        get_resource_or_404(Team, team_id, "Team")  
+        get_resource_or_404(Team, team_id, "Team")
         del Team.teams[team_id] # Löscht die Referenz zum Team
         return {"message" : f"removed team {team_id}"},  204
 
@@ -256,7 +278,8 @@ class TeamFlee(MethodView):
         team = get_resource_or_404(Team, team_id, "Team")
         # Wähle ein zufälliges Team oder ein spezifisches Team
         if random_choice:
-            team_list = [t for t in Team.teams.values() if t != team]  # Team kann nicht vor sich selbst fliehen
+            # Team kann nicht vor sich selbst fliehen
+            team_list = [t for t in Team.teams.values() if t != team]  
             if not team_list:
                 abort(404, message="No other teams available to flee to.")
             other_team = random.choice(team_list)
