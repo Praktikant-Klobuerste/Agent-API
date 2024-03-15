@@ -254,7 +254,8 @@ class TeamDetail(MethodView):
             dict: Ein Dictionary, das das Team repräsentiert.
             
         Raises:
-            HTTPException: Eine Exception mit einem 404 Statuscode, wenn das Team nicht gefunden wird.
+            HTTPException: Eine Exception mit einem 404 Statuscode, wenn das Team nicht 
+                           gefunden wird.
         """
         team = get_resource_or_404(Team, team_id, "Team")
         return team.to_dict()
@@ -373,9 +374,29 @@ class TeamAgent(MethodView):
 
 @blp.route("/team/<int:team_id>/space")
 class TeamSpace(MethodView):
+    """
+    Eine View-Klasse, die den verfügbaren Platz innerhalb eines Teams über eine REST-API 
+    bereitstellt.
+    """
+
     def get(self, team_id):
+        """
+        Verarbeitet GET-Anfragen, um den verfügbaren Platz in einem spezifischen Team zurückzugeben.
+        
+        Parameter:
+            team_id (int): Die ID des Teams, dessen verfügbarer Platz ermittelt werden soll.
+        
+        Returns:
+            dict: Ein Dictionary mit dem Schlüssel 'space', der den verfügbaren Platz des Teams 
+                  angibt.
+            
+        Raises:
+            HTTPException: Eine Exception mit einem 404 Statuscode, wenn das Team nicht gefunden 
+                           wird.
+        """
         team = get_resource_or_404(Team, team_id, "Team")
         return {"space": team.space()}
+
 
 
 @blp.route("/team/<int:team_id>/flee")
