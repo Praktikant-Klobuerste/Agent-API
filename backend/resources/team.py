@@ -54,16 +54,16 @@ class Team:
                 "lair" : self.lair.to_dict(),
                 "id" : self.id,
                 "agents" : [agent.to_dict() for agent in self.agents.values()]}
-    
+
     @classmethod
     def get(cls, team_id):
         return cls.teams.get(team_id)
-    
+
     @classmethod
     def name_exists(cls, name: str) -> bool:
         return any(team.name == name for team in cls.teams.values())
-    
-    
+
+
 def get_resource_or_404(model, resource_id, resource_name):
     resource = model.get(resource_id)
     if resource is None:
@@ -75,7 +75,7 @@ def get_resource_or_404(model, resource_id, resource_name):
 class TeamsList(MethodView):
     def get(self):
         return [team.to_dict() for team in Team.teams.values()]
-    
+
     @blp.arguments(TeamCreateSchema)
     @blp.response(201, TeamSchema)
     def post(self, new_data):
@@ -88,15 +88,15 @@ class TeamsList(MethodView):
             abort(404, message="Lair with the specified id not found.")
         team = Team(name=new_data["name"], lair=lair)
         return team.to_dict(), 201
-        
-    
+
+
 
 @blp.route("/team/<int:team_id>")
 class TeamDetail(MethodView):
     def get(self, team_id):
         team = get_resource_or_404(Team, team_id, "Team")
         return team.to_dict()
-    
+
     # Zum Aktualisieren eines Teams (PUT)
     @blp.arguments(TeamUpdateSchema)
     def put(self, update_data, team_id):
@@ -112,14 +112,14 @@ class TeamDetail(MethodView):
             team.lair = new_lair
 
         return team.to_dict(), 200
-    
-    
+
+
     def delete(self, team_id):
-        team = get_resource_or_404(Team, team_id, "Team")  
+        get_resource_or_404(Team, team_id, "Team")  
         del Team.teams[team_id] # Löscht die Referenz zum Team
         return {"message" : f"removed team {team_id}"},  204
-    
-    
+
+
 
 @blp.route("/team/<int:team_id>/agent")
 class TeamAgent(MethodView):
@@ -133,13 +133,13 @@ class TeamAgent(MethodView):
     def post(self, new_data, team_id):
         team = get_resource_or_404(Team, team_id, "Team")
         agent = get_resource_or_404(Agent, new_data.get("agent_id"), "Agent")
-       
+
 
         if team.add_agent(agent):
             return team.to_dict()["agents"], 201
-        
+
         abort(418, message=f"Team {team_id} is full or lair is unsecret")
-            
+
 
     
 @blp.route("/team/<int:team_id>/space")
@@ -147,7 +147,7 @@ class TeamSpace(MethodView):
     def get(self, team_id):
         team = get_resource_or_404(Team, team_id, "Team")
         return {"space": team.space()}
-    
+
 
 @blp.route("/team/<int:team_id>/flee")
 class TeamFlee(MethodView):
@@ -172,7 +172,7 @@ class TeamFlee(MethodView):
             other_team = random.choice(team_list)
         else:
             other_team = Team.get(other_team_id)
-            
+
         if other_team is None:
             abort(404, message=f"Other Team with id {other_team_id} not found.")
 
@@ -182,7 +182,7 @@ class TeamFlee(MethodView):
         # Führe den Fluchtvorgang aus
         team.flee(other_team)
         return {"message": "Flee operation successful"}, 200
-    
+
 
 @blp.route("/team/<int:team_id>/agent/<int:agent_id>")
 class TeamAgentDetail(MethodView):
