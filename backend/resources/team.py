@@ -401,8 +401,32 @@ class TeamSpace(MethodView):
 
 @blp.route("/team/<int:team_id>/flee")
 class TeamFlee(MethodView):
+    """
+    Eine View-Klasse, die es ermöglicht, dass ein Team Agenten zu einem anderen Team oder 
+    zufällig ausgewählten Teams versetzt.
+    """
+
     @blp.arguments(TeamFleeSchema)
     def put(self, update_data, team_id):
+        """
+        Verarbeitet PUT-Anfragen, um einen Fluchtvorgang für ein Team auszuführen.
+        
+        Basierend auf den übergebenen Daten wird entschieden, ob Agenten zu einem spezifischen oder 
+        zufällig gewählten Team versetzt werden.
+        
+        Parameter:
+            update_data (dict): Ein Dictionary mit den Einstellungen für den Fluchtvorgang.
+            team_id (int): Die ID des Teams, das den Fluchtvorgang durchführt.
+        
+        Returns:
+            dict: Ein Dictionary mit einer Nachricht, die den Erfolg des Fluchtvorgangs bestätigt.
+            
+        Raises:
+            HTTPException: Eine Exception mit einem 400 oder 404 Statuscode, wenn die Anfrage 
+                           ungültig ist oder Ziele nicht gefunden werden.
+        """
+        # Die Validierung und Ausführung des Fluchtvorgangs ist hier implementiert.
+
         random_choice = update_data.get('random', False)
         other_team_id = update_data.get('other_team')
 
