@@ -185,12 +185,40 @@ def get_resource_or_404(model:object, resource_id, resource_name:str):
 
 @blp.route("/team")
 class TeamsList(MethodView):
+    """
+    Eine View-Klasse, die Operationen für die Liste der Teams über eine REST-API bereitstellt.
+    
+    Diese Klasse unterstützt das Abrufen einer Liste aller Teams und das Erstellen neuer Teams.
+    """
+
     def get(self):
+        """
+        Verarbeitet GET-Anfragen, um eine Liste aller vorhandenen Teams zurückzugeben.
+        
+        Returns:
+            list: Eine Liste von Dictionaries, die die Teams repräsentieren.
+        """
         return [team.to_dict() for team in Team.teams.values()]
 
     @blp.arguments(TeamCreateSchema)
     @blp.response(201, TeamSchema)
     def post(self, new_data):
+        """
+        Verarbeitet POST-Anfragen, um ein neues Team basierend auf den übergebenen Daten zu erstellen.
+        
+        Prüft, ob der Teamname bereits verwendet wird, und ob das angegebene Versteck existiert.
+        Erstellt ein neues Team, wenn die Validierung erfolgreich ist.
+        
+        Parameter:
+            new_data (dict): Ein Dictionary mit den Daten des zu erstellenden Teams.
+        
+        Returns:
+            tuple: Ein Tuple, bestehend aus dem Dictionary, das das neue Team repräsentiert, und dem HTTP-Statuscode 201.
+        
+        Raises:
+            HTTPException: Eine Exception mit einem 400 Statuscode, wenn der Teamname bereits verwendet wird,
+                           oder mit einem 404 Statuscode, wenn das angegebene Versteck nicht gefunden wird.
+        """
         # Prüfen, ob der Teamname schon vergeben ist.
         if Team.name_exists(new_data["name"]):
             abort(400, message=f"Team name '{new_data['name']}' is already in use.")
@@ -200,6 +228,7 @@ class TeamsList(MethodView):
             abort(404, message="Lair with the specified id not found.")
         team = Team(name=new_data["name"], lair=lair)
         return team.to_dict(), 201
+
 
 
 
