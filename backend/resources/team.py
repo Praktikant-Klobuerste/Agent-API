@@ -11,9 +11,31 @@ blp = Blueprint("Team", __name__, description="Operations on Teams")
 
 
 class Team:
+    """
+    Repräsentiert ein Team, das eine Gruppe von Agenten in einem Versteck (Lair) enthält.
+    
+    Attribute:
+        name (str): Der Name des Teams.
+        lair (Lair): Das Versteck des Teams.
+        id (int): Die eindeutige ID des Teams.
+        agents (dict): Ein Dictionary, das Agenten-Objekte enthält, mit Agenten-IDs als Schlüssel.
+        
+    Klassenattribute:
+        _nTeams (int): Zählt die Gesamtanzahl der erstellten Team-Instanzen.
+        teams (dict): Ein Klassenweites Dictionary, das Team-Objekte enthält, mit Team-IDs als Schlüssel.
+    """
+
     _nTeams = 0
     teams = {}
+
     def __init__(self, name, lair:Lair):
+        """
+        Initialisiert eine neue Instanz der Klasse Team.
+        
+        Parameter:
+            name (str): Der Name des Teams.
+            lair (Lair): Das Versteck des Teams, in dem es operiert.
+        """
         self.name = name
         self.lair = lair
         self.id = Team._nTeams
@@ -22,46 +44,114 @@ class Team:
         Team.teams[self.id] = self
 
     def __len__(self):
+        """
+        Gibt die Anzahl der Agenten im Team zurück.
+        
+        Returns:
+            int: Die Anzahl der Agenten.
+        """
         return len(self.agents)
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other:'Team'):
+        """
+        Überprüft, ob zwei Teams gleich sind, basierend auf ihrer ID.
+        
+        Parameter:
+            other (object): Das andere Team, mit dem der Vergleich durchgeführt wird.
+            
+        Returns:
+            bool: True, wenn die IDs beider Teams gleich sind, sonst False.
+        """
         return self.id == other.id
 
     def space(self):
+        """
+        Berechnet den verfügbaren Platz im Versteck des Teams.
+        
+        Returns:
+            int: Die Anzahl der zusätzlichen Agenten, die das Team aufnehmen kann.
+        """
         return self.lair.cap - len(self)
 
-    def add_agent(self, agent: Agent) -> bool:
+    def add_agent(self, agent:Agent):
+        """
+        Fügt einen Agenten zum Team hinzu, wenn im Versteck Platz ist und das Versteck geheim ist.
+        
+        Parameter:
+            agent (Agent): Der hinzuzufügende Agent.
+            
+        Returns:
+            bool: True, wenn der Agent erfolgreich hinzugefügt wurde, sonst False.
+        """
         if not self.lair.secret or self.space() <= 0:
             return False
         self.agents[agent.id] = agent
         return True
 
-
-    def contains(self, agent:Agent):
+    def contains(self, agent):
+        """
+        Überprüft, ob ein bestimmter Agent im Team enthalten ist.
+        
+        Parameter:
+            agent (Agent): Der Agent, dessen Vorhandensein überprüft wird.
+            
+        Returns:
+            bool: True, wenn der Agent im Team ist, sonst False.
+        """
         return agent.id in self.agents
 
-
-    def flee(self, other) -> None:
+    def flee(self, other:'Team'):
+        """
+        Überträgt Agenten zum anderen Team, wenn im anderen Team Platz ist und der Agent nicht bereits dort ist.
+        
+        Parameter:
+            other (Team): Das Team, zu dem die Agenten fliehen.
+        """
         agents_copy = list(self.agents.values())
         for agent in agents_copy:
             if not other.contains(agent) and other.space():
                 other.add_agent(agent)
                 del self.agents[agent.id]
 
+    def to_dict(self) -> dict:
+        """
+        Konvertiert das Team-Objekt in ein Dictionary für die Serialisierung oder ähnliche Zwecke.
+        
+        Returns:
+            dict: Ein Dictionary, das die Attribute des Teams repräsentiert.
+        """
+        return {"name": self.name,
+                "lair": self.lair.to_dict(),
+                "id": self.id,
+                "agents": [agent.to_dict() for agent in self.agents.values()]}
 
-    def to_dict(self):
-        return {"name" : self.name,
-                "lair" : self.lair.to_dict(),
-                "id" : self.id,
-                "agents" : [agent.to_dict() for agent in self.agents.values()]}
 
     @classmethod
-    def get(cls, team_id):
+    def get(cls, team_id:int):
+        """
+        Ermöglicht den Zugriff auf ein Team-Objekt anhand seiner ID.
+        
+        Parameter:
+            team_id (int): Die ID des Teams, das abgerufen werden soll.
+            
+        Returns:
+            Team: Das Team-Objekt mit der angegebenen ID, falls vorhanden, sonst None.
+        """
         return cls.teams.get(team_id)
 
     @classmethod
-    def name_exists(cls, name: str) -> bool:
+    def name_exists(cls, name:str):
+        """
+        Überprüft, ob bereits ein Team mit dem angegebenen Namen existiert.
+        
+        Parameter:
+            name (str): Der Name, der überprüft werden soll.
+            
+        Returns:
+            bool: True, wenn ein Team mit dem Namen existiert, sonst False.
+        """
         return any(team.name == name for team in cls.teams.values())
+
 
 
 def get_resource_or_404(model, resource_id, resource_name):
