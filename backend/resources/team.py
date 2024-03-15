@@ -28,7 +28,7 @@ class Team:
     _nTeams = 0
     teams = {}
 
-    def __init__(self, name, lair:Lair):
+    def __init__(self, name, lair:Lair) -> None:
         """
         Initialisiert eine neue Instanz der Klasse Team.
         
@@ -43,7 +43,7 @@ class Team:
         Team._nTeams += 1
         Team.teams[self.id] = self
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Gibt die Anzahl der Agenten im Team zurück.
         
@@ -52,7 +52,7 @@ class Team:
         """
         return len(self.agents)
 
-    def __eq__(self, other:'Team'):
+    def __eq__(self, other:'Team') -> bool:
         """
         Überprüft, ob zwei Teams gleich sind, basierend auf ihrer ID.
         
@@ -64,7 +64,7 @@ class Team:
         """
         return self.id == other.id
 
-    def space(self):
+    def space(self) -> int:
         """
         Berechnet den verfügbaren Platz im Versteck des Teams.
         
@@ -73,7 +73,7 @@ class Team:
         """
         return self.lair.cap - len(self)
 
-    def add_agent(self, agent:Agent):
+    def add_agent(self, agent:Agent) -> bool:
         """
         Fügt einen Agenten zum Team hinzu, wenn im Versteck Platz ist und das Versteck geheim ist.
         
@@ -88,7 +88,7 @@ class Team:
         self.agents[agent.id] = agent
         return True
 
-    def contains(self, agent):
+    def contains(self, agent:Agent) -> bool:
         """
         Überprüft, ob ein bestimmter Agent im Team enthalten ist.
         
@@ -100,7 +100,7 @@ class Team:
         """
         return agent.id in self.agents
 
-    def flee(self, other:'Team'):
+    def flee(self, other:'Team') -> None:
         """
         Überträgt Agenten zum anderen Team, 
         wenn im anderen Team Platz ist und der Agent nicht bereits dort ist.
@@ -128,7 +128,7 @@ class Team:
 
 
     @classmethod
-    def get(cls, team_id:int):
+    def get(cls, team_id:int) -> 'Team':
         """
         Ermöglicht den Zugriff auf ein Team-Objekt anhand seiner ID.
         
@@ -141,7 +141,7 @@ class Team:
         return cls.teams.get(team_id)
 
     @classmethod
-    def name_exists(cls, name:str):
+    def name_exists(cls, name:str) -> bool:
         """
         Überprüft, ob bereits ein Team mit dem angegebenen Namen existiert.
         
@@ -155,7 +155,7 @@ class Team:
 
 
 
-def get_resource_or_404(model:object, resource_id, resource_name:str):
+def get_resource_or_404(model:object, resource_id, resource_name:str) -> object:
     """
     Versucht, eine Ressource anhand ihrer ID aus einem Datenmodell abzurufen. 
     Gibt die Ressource zurück, wenn sie gefunden wird. Löst einen 404 Fehler aus, 
@@ -191,7 +191,7 @@ class TeamsList(MethodView):
     Diese Klasse unterstützt das Abrufen einer Liste aller Teams und das Erstellen neuer Teams.
     """
 
-    def get(self):
+    def get(self) -> list:
         """
         Verarbeitet GET-Anfragen, um eine Liste aller vorhandenen Teams zurückzugeben.
         
@@ -202,7 +202,7 @@ class TeamsList(MethodView):
 
     @blp.arguments(TeamCreateSchema)
     @blp.response(201, TeamSchema)
-    def post(self, new_data):
+    def post(self, new_data:dict):
         """
         Verarbeitet POST-Anfragen, um ein neues Team basierend auf den übergebenen 
         Daten zu erstellen.
@@ -243,7 +243,7 @@ class TeamDetail(MethodView):
     Ermöglicht das Abrufen, Aktualisieren und Löschen von Teams anhand ihrer ID.
     """
 
-    def get(self, team_id):
+    def get(self, team_id:int) -> dict:
         """
         Verarbeitet GET-Anfragen, um ein spezifisches Team basierend auf seiner ID zurückzugeben.
         
@@ -261,7 +261,7 @@ class TeamDetail(MethodView):
         return team.to_dict()
 
     @blp.arguments(TeamUpdateSchema)
-    def put(self, update_data, team_id):
+    def put(self, update_data:dict, team_id:int):
         """
         Verarbeitet PUT-Anfragen, um ein spezifisches Team basierend auf seiner ID zu aktualisieren.
         
@@ -289,7 +289,7 @@ class TeamDetail(MethodView):
 
         return team.to_dict(), 200
 
-    def delete(self, team_id):
+    def delete(self, team_id:int):
         """
         Verarbeitet DELETE-Anfragen, um ein spezifisches Team basierend auf seiner ID zu löschen.
         
@@ -321,7 +321,7 @@ class TeamAgent(MethodView):
     Agenten zu einem Team.
     """
 
-    def get(self, team_id):
+    def get(self, team_id)  -> list:
         """
         Verarbeitet GET-Anfragen, um die Liste aller Agenten eines spezifischen Teams zurückzugeben.
         
@@ -339,7 +339,7 @@ class TeamAgent(MethodView):
         return team.to_dict()["agents"]
 
     @blp.arguments(Agent_to_TeamSchema)
-    def post(self, new_data, team_id):
+    def post(self, new_data:dict, team_id:int):
         """
         Verarbeitet POST-Anfragen, um einen neuen Agenten zu einem spezifischen Team hinzuzufügen.
         
@@ -379,7 +379,7 @@ class TeamSpace(MethodView):
     bereitstellt.
     """
 
-    def get(self, team_id):
+    def get(self, team_id:int) -> dict:
         """
         Verarbeitet GET-Anfragen, um den verfügbaren Platz in einem spezifischen Team zurückzugeben.
         
@@ -407,7 +407,7 @@ class TeamFlee(MethodView):
     """
 
     @blp.arguments(TeamFleeSchema)
-    def put(self, update_data, team_id):
+    def put(self, update_data:dict, team_id:int) -> dict:
         """
         Verarbeitet PUT-Anfragen, um einen Fluchtvorgang für ein Team auszuführen.
         
@@ -466,7 +466,7 @@ class TeamAgentDetail(MethodView):
     über eine REST-API bereitstellt.
     """
 
-    def delete(self, team_id, agent_id):
+    def delete(self, team_id:int, agent_id:int) -> dict:
         """
         Verarbeitet DELETE-Anfragen, um einen Agenten aus einem spezifischen Team zu entfernen.
         
